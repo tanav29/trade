@@ -65,6 +65,8 @@ export const orders = pgTable("orders", {
   filledQuantity: integer("filled_quantity").notNull().default(0),
   status: varchar("status", { length: 16 }).notNull().default("open"),
   market: boolean("market").notNull().default(false),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }),
+  requestFingerprint: varchar("request_fingerprint"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

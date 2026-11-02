@@ -10,9 +10,10 @@ import tradeRoutes from "./routes/trade";
 import adminRoutes from "./routes/admin";
 import { db } from "./db";
 import { symbols } from "./schema";
-import { connectRedis } from "./redis";
+import { connectRedis, redisClient } from "./redis";
 import { registerSseClient, unregisterSseClient } from "./sse";
 import { parseOrderbook } from "./matching";
+import { syncAllBooks } from "./durable-matching";
 
 dotenv.config();
 
@@ -45,7 +46,17 @@ app.route("/auth", authRoutes);
 app.route("/user", userRoutes);
 app.route("/admin", adminRoutes);
 
-connectRedis().catch((err) => console.error("Redis connection error:", err));
+// Retry from PostgreSQL even after Redis loses its contents without a process restart.
+void connectRedis().catch(err => console.error("Redis connection error:", err));
+let recovering = false;
+async function recoverBooks() {
+  if (recovering || !redisClient.isReady) return;
+  recovering = true;
+  try { await syncAllBooks(); } catch (err) { console.error("Book recovery failed:", err); }
+  finally { recovering = false; }
+}
+redisClient.on("ready", () => void recoverBooks());
+setInterval(() => void recoverBooks(), 5000);
 
 app.get("/ping", (c) => {
   return c.json({ status: "healthy", timestamp: new Date().toISOString() });

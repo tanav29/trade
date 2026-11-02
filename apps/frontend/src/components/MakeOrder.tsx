@@ -3,7 +3,7 @@
 import { Button } from "@/components/primitives";
 import { Input } from "@/components/primitives";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/primitives";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "@/lib/api";
@@ -28,6 +28,7 @@ interface Props {
 
 const MakeOrder = ({ symbol }: Props) => {
   const queryClient = useQueryClient();
+  const pendingOrder = useRef<{ signature: string; key: string } | null>(null);
   const [formData, setFormData] = useState<FormData>({
     side: "bid",
     price: "",
@@ -69,7 +70,7 @@ const MakeOrder = ({ symbol }: Props) => {
   });
 
   const { isPending, mutate } = useMutation({
-    mutationFn: async (data: FormData & { sym: string }) => {
+    mutationFn: async (data: FormData & { sym: string; key: string }) => {
       const body: Record<string, unknown> = {
         side: data.side,
         symbol: data.sym,
@@ -81,10 +82,12 @@ const MakeOrder = ({ symbol }: Props) => {
       }
       return await api<MakeOrderResponse>("/trade/makeorder", {
         method: "POST",
+        headers: { "Idempotency-Key": data.key },
         body: JSON.stringify(body),
       });
     },
     onSuccess: (data) => {
+      pendingOrder.current = null;
       if (data.ok) {
         toast.success(data.msg || "Order submitted successfully!");
         setFormData((prev) => ({ ...prev, price: "", quantity: "" }));
@@ -116,7 +119,9 @@ const MakeOrder = ({ symbol }: Props) => {
       toast.error("Price and quantity are required for limit orders.");
       return;
     }
-    mutate({ ...formData, sym: symbol });
+    const signature = JSON.stringify({ ...formData, symbol });
+    if (pendingOrder.current?.signature !== signature) pendingOrder.current = { signature, key: crypto.randomUUID() };
+    mutate({ ...formData, sym: symbol, key: pendingOrder.current.key });
   };
 
   return (

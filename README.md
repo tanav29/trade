@@ -150,3 +150,32 @@ bun run check-types
 ## Notes
 
 This is a trading simulator for engineering and product demonstration. It is not connected to live brokerage infrastructure and should not be used for real-money trading.
+
+
+## Matching, retries, and recovery
+
+PostgreSQL is the source of truth for orders, reservations, trades, balances, holdings, and candles. Each submission or cancellation runs in one PostgreSQL transaction. A transaction-scoped advisory lock serializes work for each symbol across backend processes; user rows are locked in ID order so orders for different symbols cannot spend the same available cash concurrently. An order is processed synchronously: if the worker stops before commit, PostgreSQL rolls back and releases its locks; if it stops after commit, the order remains committed. The client can retry to learn its order ID.
+
+`POST /trade/makeorder` requires an `Idempotency-Key` header (1?128 characters), unique per user and logical order. Reuse the same key and identical body after a timeout or lost response. A committed retry returns the existing order ID; changing the body for the same key returns HTTP 409. Rejected orders are not recorded and may be retried. The web form retains its key after a network error for an unchanged order.
+
+Every transaction that changes an open book writes a pending-symbol marker in PostgreSQL. After commit, a worker rebuilds both Redis lists from committed open orders using an atomic Redis transaction. It holds the same symbol lock until the cache write and marker deletion complete, so a stale rebuild cannot overwrite a newer book. If the worker stops before the Redis write, or after the write but before deleting the marker, a later rebuild safely repeats it. All symbols are rebuilt on Redis connection and every five seconds, including after Redis loses its data. Redis and depth views can lag while Redis is unavailable; matching and balances never depend on the cache. Recovery and broadcast occur only while a backend process is running. Apply the new migration before starting this version. Existing books should be reconciled against PostgreSQL before upgrading: older versions could leave Redis, orders and reservations inconsistent, and rebuilding cannot infer missing historical state.
+
+## Integration and load tests
+
+Use a **disposable**, migrated PostgreSQL database and Redis instance. Set `DATABASE_URL` and `REDIS_URL` for `apps/backend`; then from that directory run:
+
+```bash
+RUN_INTEGRATION=1 bun test src/durable-matching.integration.test.ts
+```
+
+The test creates its own users and symbol, submits overlapping orders and a duplicate request, deliberately skips the post-commit cache update, and checks balances, quantities and recovery. On PowerShell use `$env:RUN_INTEGRATION="1"` before the command. Do not point this test at a production database.
+
+For an HTTP load run, start the backend with the migrated disposable database and Redis, create a dedicated user and symbol with no crossing asks, and provide the user's authentication cookie. The test creates real resting bid orders and reserves cash (one cent per order), so use disposable data. From `apps/backend`:
+
+```bash
+LOAD_COOKIE='YOUR_SESSION_COOKIE' LOAD_SYMBOL=TEST LOAD_ORDERS=200 LOAD_CONCURRENCY=20 bun scripts/load-test.ts
+```
+
+PowerShell: set those four values with `$env:LOAD_COOKIE`, `$env:LOAD_SYMBOL`, `$env:LOAD_ORDERS`, and `$env:LOAD_CONCURRENCY`, then run `bun scripts/load-test.ts`. The script reports order volume, concurrency, p50/p95 request latency, error count/rate, elapsed time, Bun version and OS/architecture. The default API rate limit is 300 requests per 15 minutes per IP, so larger runs include rate-limit errors unless configured in an isolated test deployment.
+
+**Measurement status (2026-11-03):** No valid load result is available. The development environment had Bun 1.4.2 on Windows x64 and reachable PostgreSQL, but Redis was unavailable and the Docker engine was not running. Volume, concurrency, p50/p95 and error rate are therefore unmeasured; run the command above with both services available to produce results.
