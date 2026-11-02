@@ -8,10 +8,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { Button } from "../../components/ui/button";
+} from "@/components/primitives";
+import { Input } from "@/components/primitives";
+import { Label } from "@/components/primitives";
+import { Button } from "@/components/primitives";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";

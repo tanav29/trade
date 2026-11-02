@@ -25,16 +25,17 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={cn(
-          "min-h-screen max-w-7xl border mx-auto bg-background text-foreground",
+          "min-h-screen mx-auto bg-background text-foreground",
           geist.className,
         )}
       >
+        <a href="#main-content" className="fixed -top-20 left-4 z-[100] rounded bg-slate-100 px-4 py-2 text-slate-950 focus:top-4">Skip to content</a>
         <NextTopLoader />
         <Providers>
           <Nav />
-          {children}
+          <div id="main-content" tabIndex={-1}>{children}</div>
         </Providers>
-        <Toaster />
+        <Toaster theme="dark" />
       </body>
     </html>
   );

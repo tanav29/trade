@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
+import { Button } from "@/components/primitives";
 import { useCallback, useEffect } from "react";
 import { api } from "@/lib/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ const navLinks = [
 
 function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   return (
-    <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground px-6">
+    <div className="flex items-center gap-4 whitespace-nowrap text-sm font-medium text-muted-foreground">
       {navLinks.map((link) => (
         <Link
           key={link.href}
@@ -106,7 +106,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-center gap-4">
       <NavLinks isAdmin={!!data?.user.isAdmin} />
       <Button variant="outline" onClick={handleSignOut} disabled={isPending}>
         {isPending && <Loader2 className="w-5 h-5 animate-spin" />}

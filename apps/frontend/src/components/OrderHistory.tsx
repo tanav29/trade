@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/primitives";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/primitives";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCcw } from "lucide-react";
 import type { OrderHistoryEntry, PaginatedResponse } from "@/types";
 

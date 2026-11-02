@@ -1,15 +1,13 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/primitives";
+import { Input } from "@/components/primitives";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/primitives";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "@/lib/api";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/primitives";
 import type { User, UserOrder } from "@/types";
 
 type FormData = {
@@ -129,27 +127,10 @@ const MakeOrder = ({ symbol }: Props) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Tabs
-          value={formData.side}
-          onValueChange={(v: string) =>
-            setFormData((prev) => ({ ...prev, side: v as "bid" | "ask" }))
-          }
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger
-              value="bid"
-              className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-            >
-              BUY
-            </TabsTrigger>
-            <TabsTrigger
-              value="ask"
-              className="data-[state=active]:bg-red-500 data-[state=active]:text-white"
-            >
-              SELL
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="grid grid-cols-2 gap-2" role="group" aria-label="Order side">
+          <button type="button" aria-pressed={!selling} onClick={() => setFormData(prev => ({ ...prev, side: "bid" }))} className={`rounded-md py-2 text-sm font-semibold ${!selling ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300"}`}>Buy</button>
+          <button type="button" aria-pressed={selling} onClick={() => setFormData(prev => ({ ...prev, side: "ask" }))} className={`rounded-md py-2 text-sm font-semibold ${selling ? "bg-red-600 text-white" : "bg-slate-800 text-slate-300"}`}>Sell</button>
+        </div>
 
         <section className="rounded-lg border bg-muted/30 p-3" aria-label={`${symbol} ${selling ? "sell" : "buy"} account summary`}>
           <div className="flex items-start justify-between gap-3">
@@ -172,15 +153,9 @@ const MakeOrder = ({ symbol }: Props) => {
         </section>
 
         <div className="flex items-center space-x-2">
-          <Switch
-            id="market-mode"
-            checked={formData.market}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, market: checked, price: "" }))
-            }
-          />
+          <input type="checkbox" id="market-mode" checked={formData.market} onChange={(e) => setFormData(prev => ({ ...prev, market: e.target.checked, price: "" }))} className="h-4 w-4 accent-blue-500" />
           <Label htmlFor="market-mode" className="text-sm font-medium">
-            Market Order
+            Market order
           </Label>
         </div>
 

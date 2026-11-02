@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Card, CardContent, CardHeader } from "./ui/card";
+import { Card, CardContent, CardHeader } from "@/components/primitives";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Orderbook } from "@/types";

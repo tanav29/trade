@@ -22,11 +22,11 @@ export default function Chart({ symbol }: { symbol: string }) {
   useEffect(() => {
     if (!container.current) return;
     const chart = createChart(container.current, {
-      width: container.current.clientWidth, height: 500,
-      layout: { background: { color: "#ffffff" }, textColor: "#687381" },
-      grid: { vertLines: { color: "#f1f3f5" }, horzLines: { color: "#f1f3f5" } },
-      rightPriceScale: { borderColor: "#e5e7eb" },
-      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "#e5e7eb" },
+      width: container.current.clientWidth, height: 380,
+      layout: { background: { color: "#0f172a" }, textColor: "#94a3b8" },
+      grid: { vertLines: { color: "#1e293b" }, horzLines: { color: "#1e293b" } },
+      rightPriceScale: { borderColor: "#334155" },
+      timeScale: { timeVisible: true, secondsVisible: false, borderColor: "#334155" },
     });
     series.current = chart.addCandlestickSeries({ upColor: "#19a789", downColor: "#df5b61", borderVisible: false, wickUpColor: "#19a789", wickDownColor: "#df5b61" });
     const observer = new ResizeObserver(() => chart.applyOptions({ width: container.current?.clientWidth || 0 }));
@@ -64,13 +64,13 @@ export default function Chart({ symbol }: { symbol: string }) {
     };
   }, [data, symbol, queryClient]);
 
-  return <section className="rounded-lg border bg-white text-slate-900 overflow-hidden">
-    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-      <div><h2 className="text-lg font-semibold">{symbol}</h2><p className="text-xs text-slate-500">1 minute ? Trade price</p></div>
-      <div className="text-right"><p className="text-xl font-semibold tabular-nums">{price === null ? "?" : `$${price.toFixed(2)}`}</p><p className="text-xs text-slate-500">Last traded price</p></div>
+  return <section className="rounded-lg border bg-slate-900 text-slate-100 overflow-hidden">
+    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-700">
+      <div><h2 className="text-lg font-semibold">{symbol}</h2><p className="text-xs text-slate-400">1 minute &middot; Trade price</p></div>
+      <div className="text-right"><p className="text-xl font-semibold tabular-nums">{price === null ? "\u2014" : `$${price.toFixed(2)}`}</p><p className="text-xs text-slate-400">Last traded price</p></div>
     </div>
-    <div className="relative"><div ref={container} className="w-full h-[500px]" />
-      {(isPending || isError || (!data?.length && price === null)) && <p className="absolute inset-0 grid place-items-center pointer-events-none text-sm text-slate-500">{isPending ? "Loading chart?" : isError ? "Could not load chart history." : "No trades yet for this stock."}</p>}
+    <div className="relative"><div ref={container} className="w-full h-[380px]" />
+      {(isPending || isError || (!data?.length && price === null)) && <p className="absolute inset-0 grid place-items-center pointer-events-none text-sm text-slate-400">{isPending ? "Loading chart?" : isError ? "Could not load chart history." : "No trades yet for this stock."}</p>}
     </div>
   </section>;
 }

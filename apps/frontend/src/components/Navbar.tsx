@@ -4,8 +4,8 @@ import Auth from "./Auth";
 
 export const Nav = () => {
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
-      <div className="flex items-center justify-between h-16 px-6 max-w-7xl mx-auto">
+    <nav className="border-b border-slate-800 bg-slate-950 sticky top-0 z-50 overflow-x-auto">
+      <div className="flex min-h-16 items-center justify-between gap-6 px-4 sm:px-6 max-w-[1800px] mx-auto">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">

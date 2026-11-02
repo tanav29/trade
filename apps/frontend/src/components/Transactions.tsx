@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Transaction, PaginatedResponse } from "../types";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "@/components/primitives";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/primitives";
 import { ChevronLeft, ChevronRight, Loader2, RefreshCcw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
