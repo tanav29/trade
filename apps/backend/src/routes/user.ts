@@ -34,7 +34,7 @@ router.get("/", auth, async (c) => {
 
 router.get("/verify", auth, async (c) => {
   const jwt = c.get("jwt");
-  return c.json({ user: { ...jwt, isAdmin: isAdmin(jwt.id) } });
+  return c.json({ user: { ...jwt, isAdmin: isAdmin(jwt.id, jwt.email) } });
 });
 
 router.get("/transactions", auth, async (c) => {

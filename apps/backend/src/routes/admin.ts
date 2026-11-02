@@ -8,7 +8,7 @@ import { isAdmin } from "../admin";
 const router = new Hono();
 router.use("*", auth);
 router.post("/symbols", async (c) => {
-  if (!isAdmin(c.get("jwt").id)) return c.json({ msg: "Admin access required." }, 403);
+  if (!isAdmin(c.get("jwt").id, c.get("jwt").email)) return c.json({ msg: "Admin access required." }, 403);
   const input = z.object({
     symbol: z.string().trim().toUpperCase().regex(/^[A-Z0-9]{1,10}$/),
     name: z.string().trim().min(1).max(255),

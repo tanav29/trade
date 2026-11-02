@@ -59,6 +59,7 @@ DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/tradex
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=replace-with-a-long-random-secret
 ADMIN_USER_IDS=1 # comma-separated IDs of existing admin accounts
+ADMIN_EMAILS=tanav@me.xyz # comma-separated admin email addresses
 FRONTEND_ORIGIN=http://localhost:3000
 PORT=8080
 NODE_ENV=development
@@ -70,7 +71,7 @@ Create `apps/frontend/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-Admin access is granted only to existing account IDs listed in `ADMIN_USER_IDS`. Create an account, find its ID in the `users` table, configure the ID, and restart the backend. The admin panel at `/admin` is the only application interface for adding stocks. The initial shares entered when creating a stock are allocated to the admin account, so they can place sell orders. A stock has no last traded price until its first trade.
+Admin access is granted to accounts listed by ID in `ADMIN_USER_IDS` or by email in `ADMIN_EMAILS`. Restart the backend after changing these settings. Signup does not verify email addresses, so make sure an admin email is registered by its intended owner before enabling email-based access. The admin panel at `/admin` is the only application interface for adding stocks. The initial shares entered when creating a stock are allocated to the admin account, so they can place sell orders. A stock has no last traded price until its first trade.
 
 ### 3. Prepare the database
 
