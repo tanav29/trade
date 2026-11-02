@@ -3,7 +3,7 @@ import { z } from "zod";
 import { and, count, desc, eq, ne } from "drizzle-orm";
 import { db } from "../db";
 import { redisClient } from "../redis";
-import { candles, orders as ordersTable } from "../schema";
+import { candles, symbols, orders as ordersTable } from "../schema";
 import auth from "../middleware/jwt";
 import { getUserByEmail } from "../helpers";
 import {
@@ -134,6 +134,8 @@ router.post("/makeorder", auth, async (c) => {
 
   const userId = userData.id;
   const sym = symbol.toUpperCase();
+  const [listed] = await db.select({ id: symbols.id }).from(symbols).where(eq(symbols.symbol, sym));
+  if (!listed) return c.json({ ok: false, msg: "Unknown stock symbol." }, 400);
   const holdingQty = await getPortfolio(userId, sym);
   const cash = await getCash(userId);
   const orderId = newOrderId(userId);
@@ -271,7 +273,7 @@ router.get("/chart", async (c) => {
       })),
     );
   } catch {
-    return c.json([]);
+    return c.json({ message: "Failed to load chart history." }, 500);
   }
 });
 

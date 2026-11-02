@@ -3,6 +3,7 @@ import { db } from "./db";
 import { redisClient } from "./redis";
 import { orders as ordersTable, portfolios, transactions, users } from "./schema";
 import type { Order } from "./types";
+import { recordTradePrice } from "./utils/trade-price";
 import { findInsertIndex, matchAgainstBook, type Fill } from "./matching-core";
 
 export function bookKey(symbol: string, side: "bid" | "ask"): string {
@@ -188,6 +189,8 @@ async function settleFill(
       price: price.toString(),
     });
   }
+
+  await recordTradePrice(symbol, price);
 
   // Bump maker order filled qty in history
   const [makerOrder] = await db

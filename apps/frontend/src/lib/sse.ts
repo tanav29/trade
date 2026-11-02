@@ -1,11 +1,11 @@
 type DepthHandler = (payload: unknown) => void;
-type ChartHandler = (payload: unknown) => void;
+type PriceHandler = (payload: unknown) => void;
 
 type SymbolStream = {
   source: EventSource;
   refCount: number;
   depthHandlers: Set<DepthHandler>;
-  chartHandlers: Set<ChartHandler>;
+  priceHandlers: Set<PriceHandler>;
 };
 
 const streams = new Map<string, SymbolStream>();
@@ -38,7 +38,7 @@ function ensureStream(symbol: string): SymbolStream | null {
     source,
     refCount: 1,
     depthHandlers: new Set(),
-    chartHandlers: new Set(),
+    priceHandlers: new Set(),
   };
 
   source.addEventListener("depth", (event) => {
@@ -50,10 +50,10 @@ function ensureStream(symbol: string): SymbolStream | null {
     }
   });
 
-  source.addEventListener("chart", (event) => {
+  source.addEventListener("price", (event) => {
     try {
       const payload = JSON.parse((event as MessageEvent).data);
-      for (const handler of stream.chartHandlers) handler(payload);
+      for (const handler of stream.priceHandlers) handler(payload);
     } catch {
       // ignore
     }
@@ -69,7 +69,7 @@ function ensureStream(symbol: string): SymbolStream | null {
 
 export function subscribeMarketStream(
   symbol: string,
-  handlers: { onDepth?: DepthHandler; onChart?: ChartHandler },
+  handlers: { onDepth?: DepthHandler; onPrice?: PriceHandler },
 ) {
   const stream = ensureStream(symbol);
   if (!stream) {
@@ -77,11 +77,11 @@ export function subscribeMarketStream(
   }
 
   if (handlers.onDepth) stream.depthHandlers.add(handlers.onDepth);
-  if (handlers.onChart) stream.chartHandlers.add(handlers.onChart);
+  if (handlers.onPrice) stream.priceHandlers.add(handlers.onPrice);
 
   return () => {
     if (handlers.onDepth) stream.depthHandlers.delete(handlers.onDepth);
-    if (handlers.onChart) stream.chartHandlers.delete(handlers.onChart);
+    if (handlers.onPrice) stream.priceHandlers.delete(handlers.onPrice);
 
     stream.refCount = Math.max(0, stream.refCount - 1);
     if (stream.refCount === 0) {

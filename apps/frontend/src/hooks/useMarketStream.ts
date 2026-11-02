@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { subscribeMarketStream } from "@/lib/sse";
 import type { Orderbook } from "@/types";
-import type { CandlestickData } from "lightweight-charts";
 
 /**
  * Subscribe to live depth + chart updates for a symbol via SSE.
@@ -26,11 +25,7 @@ export function useMarketStream(symbol: string) {
           bids: data.bids,
         });
       },
-      onChart: (payload) => {
-        const data = payload as CandlestickData[];
-        if (!Array.isArray(data) || data.length === 0) return;
-        queryClient.setQueryData(["chart", symbol], data);
-      },
+
     });
   }, [queryClient, symbol]);
 }

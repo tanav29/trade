@@ -14,6 +14,7 @@ type VerifyResponse = {
     id: number | string;
     name: string;
     email: string;
+    isAdmin: boolean;
   };
 };
 
@@ -24,7 +25,7 @@ const navLinks = [
   { href: "/transactions", label: "Transactions" },
 ] as const;
 
-function NavLinks() {
+function NavLinks({ isAdmin }: { isAdmin: boolean }) {
   return (
     <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground px-6">
       {navLinks.map((link) => (
@@ -36,6 +37,7 @@ function NavLinks() {
           {link.label}
         </Link>
       ))}
+      {isAdmin && <Link href="/admin" className="hover:text-foreground">Admin</Link>}
     </div>
   );
 }
@@ -105,7 +107,7 @@ export default function Auth() {
 
   return (
     <div className="flex items-center gap-2">
-      <NavLinks />
+      <NavLinks isAdmin={!!data?.user.isAdmin} />
       <Button variant="outline" onClick={handleSignOut} disabled={isPending}>
         {isPending && <Loader2 className="w-5 h-5 animate-spin" />}
         Sign Out

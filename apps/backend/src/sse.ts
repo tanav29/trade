@@ -1,18 +1,9 @@
-import type { Chart } from "./types";
 
 export type DepthPayload = {
   symbol: string;
   asks: { price: number; quantity: number }[];
   bids: { price: number; quantity: number }[];
 };
-
-export type ChartPayload = {
-  time: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}[];
 
 type SseClient = {
   id: string;
@@ -65,23 +56,6 @@ export function broadcastDepth(payload: DepthPayload) {
   return emitToSymbol(payload.symbol, "depth", payload);
 }
 
-export function broadcastChart(symbol: string, chart: Chart[]) {
-  const payload: ChartPayload = chart.slice(-720).map((c) => ({
-    time: Math.floor(c.timestamp.getTime() / 1000),
-    open: c.open,
-    high: c.high,
-    low: c.low,
-    close: c.close,
-  }));
-  return emitToSymbol(symbol, "chart", payload);
-}
-
-export function formatChartPayload(chart: Chart[]): ChartPayload {
-  return chart.slice(-720).map((c) => ({
-    time: Math.floor(c.timestamp.getTime() / 1000),
-    open: c.open,
-    high: c.high,
-    low: c.low,
-    close: c.close,
-  }));
+export function broadcastPrice(symbol: string, time: number, price: number) {
+  return emitToSymbol(symbol, "price", { time, price });
 }

@@ -58,6 +58,7 @@ Create `apps/backend/.env`:
 DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/tradex
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=replace-with-a-long-random-secret
+ADMIN_USER_IDS=1 # comma-separated IDs of existing admin accounts
 FRONTEND_ORIGIN=http://localhost:3000
 PORT=8080
 NODE_ENV=development
@@ -68,6 +69,8 @@ Create `apps/frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
+
+Admin access is granted only to existing account IDs listed in `ADMIN_USER_IDS`. Create an account, find its ID in the `users` table, configure the ID, and restart the backend. The admin panel at `/admin` is the only application interface for adding stocks. The initial shares entered when creating a stock are allocated to the admin account, so they can place sell orders. A stock has no last traded price until its first trade.
 
 ### 3. Prepare the database
 
@@ -126,12 +129,12 @@ bun test             # Matching engine unit tests
 
 ## Real-Time Events (SSE)
 
-Connect to `GET /events?symbol=TNV` (EventSource). Events:
+Load recent candles once from `GET /trade/chart?symbol=TNV`, then connect to `GET /events?symbol=TNV` (EventSource). Each trade updates the current one-minute candle. Events:
 
 | Event | Payload |
 | --- | --- |
 | `depth` | `{ symbol, asks, bids }` |
-| `chart` | Recent OHLC candle array |
+| `price` | `{ time, price }` for the latest executed trade |
 | `ping` | Keep-alive timestamp |
 
 ## Quality Checks

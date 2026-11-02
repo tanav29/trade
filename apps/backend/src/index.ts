@@ -7,21 +7,11 @@ import { serve } from "@hono/node-server";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
 import tradeRoutes from "./routes/trade";
-import {
-  updateChart,
-  setChartBroadcast,
-  initChart,
-  getCandles,
-} from "./utils/chart";
+import adminRoutes from "./routes/admin";
 import { db } from "./db";
 import { symbols } from "./schema";
-import { connectRedis, redisClient } from "./redis";
-import {
-  broadcastChart,
-  formatChartPayload,
-  registerSseClient,
-  unregisterSseClient,
-} from "./sse";
+import { connectRedis } from "./redis";
+import { registerSseClient, unregisterSseClient } from "./sse";
 import { parseOrderbook } from "./matching";
 
 dotenv.config();
@@ -53,22 +43,9 @@ app.use("*", limiter);
 app.route("/trade", tradeRoutes);
 app.route("/auth", authRoutes);
 app.route("/user", userRoutes);
+app.route("/admin", adminRoutes);
 
-let activeSymbols: string[] = [];
-
-async function init() {
-  await connectRedis();
-  console.log("Connected to Redis");
-
-  const allSymbols = await db.select().from(symbols);
-  activeSymbols = allSymbols.map((s) => s.symbol);
-  console.log("Active symbols:", activeSymbols);
-
-  await initChart(db, activeSymbols);
-  updateChart(db, redisClient, activeSymbols);
-}
-
-init().catch((err) => console.error("Init error:", err));
+connectRedis().catch((err) => console.error("Redis connection error:", err));
 
 app.get("/ping", (c) => {
   return c.json({ status: "healthy", timestamp: new Date().toISOString() });
@@ -105,7 +82,6 @@ app.get("/events", async (c) => {
     try {
       const depth = await parseOrderbook(symbol);
       await send("depth", depth);
-      await send("chart", formatChartPayload(getCandles(symbol)));
     } catch (err) {
       console.error("Failed to seed SSE client:", err);
     }
@@ -125,10 +101,6 @@ app.get("/events", async (c) => {
 
     unregisterSseClient(clientId);
   });
-});
-
-setChartBroadcast((symbol, payload) => {
-  void broadcastChart(symbol, payload);
 });
 
 const port = Number(process.env.PORT) || 8080;

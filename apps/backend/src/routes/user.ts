@@ -4,6 +4,7 @@ import auth from "../middleware/jwt";
 import { db } from "../db";
 import { transactions, users, portfolios, symbols } from "../schema";
 import { getUserByEmail } from "../helpers";
+import { isAdmin } from "../admin";
 
 const router = new Hono();
 
@@ -33,7 +34,7 @@ router.get("/", auth, async (c) => {
 
 router.get("/verify", auth, async (c) => {
   const jwt = c.get("jwt");
-  return c.json({ user: jwt });
+  return c.json({ user: { ...jwt, isAdmin: isAdmin(jwt.id) } });
 });
 
 router.get("/transactions", auth, async (c) => {
