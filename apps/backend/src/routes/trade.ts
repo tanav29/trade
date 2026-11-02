@@ -66,7 +66,7 @@ function newOrderId(userId: number) {
 async function publishOrderbook(symbol: string) {
   try {
     const orderbook = await parseOrderbook(symbol);
-    await broadcastDepth(orderbook);
+    void broadcastDepth(orderbook);
   } catch (err) {
     console.error(`Failed to broadcast orderbook for ${symbol}`, err);
   }

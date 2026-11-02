@@ -13,6 +13,19 @@ function order(
 }
 
 describe("matchAgainstBook", () => {
+  test("an unmatched limit order can rest and be filled by a later order", () => {
+    const first = matchAgainstBook("bid", 100, 5, 1, false, []);
+    expect(first.remainingQty).toBe(5);
+    expect(first.fills).toEqual([]);
+
+    const resting = order({ orderId: "bid", userId: 1, price: 100, quantity: first.remainingQty });
+    const later = matchAgainstBook("ask", 100, 3, 2, false, [resting]);
+    expect(later.fills).toEqual([
+      { makerOrderId: "bid", makerUserId: 1, price: 100, quantity: 3 },
+    ]);
+    expect(later.remainingBook[0].quantity).toBe(2);
+  });
+
   test("bid matches lowest ask first (price-time priority)", () => {
     const book = [
       order({ orderId: "a2", userId: 2, price: 102, quantity: 5, timestamp: 1 }),

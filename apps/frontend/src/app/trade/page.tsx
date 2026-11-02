@@ -24,30 +24,31 @@ export default function TradePage() {
     ? selectedSymbol
     : symbols[0]!.symbol;
 
+  const selected = symbols.find((s) => s.symbol === symbol);
+
   return (
-    <div className="px-2 py-6">
-      <div className="mb-4">
-        <select
-          value={symbol}
-          onChange={(e) => setSymbol(e.target.value)}
-          className="bg-card border border-border rounded-lg px-4 py-2 text-lg font-bold font-mono"
-        >
-          {symbols.map((s) => (
-            <option key={s.symbol} value={s.symbol}>
-              {s.symbol} — {s.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="flex gap-2 flex-col lg:flex-row">
-        <div className="flex-1 min-w-0">
-          <Chart symbol={symbol} />
+    <main className="mx-auto max-w-[1600px] px-3 py-5 sm:px-6">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="mb-1 text-sm font-medium text-slate-500">Markets / Trade</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Trading terminal</h1>
         </div>
-        <div className="w-full lg:w-96 flex flex-col gap-2 h-full">
-          <MakeOrder symbol={symbol} />
-          <Depth symbol={symbol} />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="market-symbol" className="text-xs font-medium text-slate-500">Market</label>
+          <select id="market-symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} className="min-w-56 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
+            {symbols.map((s) => <option key={s.symbol} value={s.symbol}>{s.symbol} ? {s.name}</option>)}
+          </select>
         </div>
       </div>
-    </div>
+      <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-3">
+        <span className="grid h-10 w-10 place-items-center rounded-md bg-blue-50 text-sm font-bold text-blue-700">{symbol.slice(0, 2)}</span>
+        <div><p className="font-semibold text-slate-900">{symbol}</p><p className="text-xs text-slate-500">{selected?.name}</p></div>
+        <span className="ml-auto rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">Equity</span>
+      </div>
+      <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-3"><Chart symbol={symbol} /><Depth symbol={symbol} /></div>
+        <MakeOrder symbol={symbol} />
+      </div>
+    </main>
   );
 }

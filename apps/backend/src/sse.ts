@@ -32,23 +32,30 @@ export function getSseClientCount(symbol?: string) {
 }
 
 async function emitToSymbol(symbol: string, event: string, data: unknown) {
-  const dead: string[] = [];
   const tasks: Promise<void>[] = [];
 
   for (const client of clients.values()) {
     if (client.symbol !== symbol) continue;
-    tasks.push(
-      client.send(event, data).catch(() => {
-        dead.push(client.id);
-      }),
-    );
+    tasks.push(sendWithTimeout(client, event, data));
   }
 
   await Promise.all(tasks);
-  for (const id of dead) {
-    const client = clients.get(id);
-    client?.close();
-    clients.delete(id);
+}
+
+async function sendWithTimeout(client: SseClient, event: string, data: unknown) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      client.send(event, data),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("SSE client timed out")), 5000);
+      }),
+    ]);
+  } catch {
+    client.close();
+    if (clients.get(client.id) === client) clients.delete(client.id);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 

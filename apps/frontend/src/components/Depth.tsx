@@ -56,7 +56,7 @@ const Depth = ({ symbol }: Props) => {
   );
   const combinedTotal = bidTotal + askTotal || 1;
   const buyPct = (bidTotal / combinedTotal) * 100;
-  const sellPct = 100 - buyPct;
+  const sellPct = (askTotal / combinedTotal) * 100;
 
   const maxBidQty = useMemo(
     () => (topBids.length ? Math.max(...topBids.map((o) => o.quantity)) : 1),
@@ -68,8 +68,9 @@ const Depth = ({ symbol }: Props) => {
   );
 
   return (
-    <Card className="shadow-md border-0">
+    <Card className="shadow-none">
       <CardHeader className="pb-3">
+        <h2 className="mb-3 text-base font-semibold">Order book</h2>
         <div className="flex items-center justify-between text-xs">
           <div className="flex flex-col">
             <span className="text-muted-foreground">Buy orders</span>
@@ -175,6 +176,7 @@ const Depth = ({ symbol }: Props) => {
               </tr>
             </tfoot>
           </table>
+          {orderBook && bidTotal === 0 && askTotal === 0 && <p className="mt-4 text-center text-xs text-muted-foreground">No open orders for {symbol}.</p>}
           {!orderBook && (
             <div className="text-center text-xs text-muted-foreground mt-4">
               Loading depth…

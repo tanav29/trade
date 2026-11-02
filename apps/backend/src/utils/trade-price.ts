@@ -14,7 +14,7 @@ export function recordTradePrice(symbol: string, price: number): Promise<void> {
     } else {
       await db.insert(candles).values({ symbol, timestamp, open: String(price), high: String(price), low: String(price), close: String(price) });
     }
-    await broadcastPrice(symbol, timestamp.getTime() / 1000, price);
+    void broadcastPrice(symbol, timestamp.getTime() / 1000, price);
   });
   pending = task.catch((err) => console.error("Failed to update trade chart:", err));
   return pending;

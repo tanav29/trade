@@ -225,6 +225,7 @@ const MakeOrder = ({ symbol }: Props) => {
             />
           </div>
 
+          {!formData.market && Number(formData.price) > 0 && Number(formData.quantity) > 0 && <div className="flex justify-between border-t pt-3 text-sm"><span className="text-muted-foreground">Estimated total</span><span className="font-semibold tabular-nums">${(Number(formData.price) * Number(formData.quantity)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></div>}
           <Button
             type="submit"
             className={`w-full font-medium ${
