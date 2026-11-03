@@ -1,4 +1,4 @@
-CREATE TABLE "candles" (
+CREATE TABLE IF NOT EXISTS "candles" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"symbol" varchar(10) NOT NULL,
 	"timestamp" timestamp NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE "candles" (
 	"volume" numeric DEFAULT '0' NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "orders" (
+CREATE TABLE IF NOT EXISTS "orders" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"order_id" varchar(64) NOT NULL,
 	"user_id" integer NOT NULL,
@@ -25,14 +25,14 @@ CREATE TABLE "orders" (
 	CONSTRAINT "orders_order_id_unique" UNIQUE("order_id")
 );
 --> statement-breakpoint
-CREATE TABLE "portfolios" (
+CREATE TABLE IF NOT EXISTS "portfolios" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"symbol" varchar(10) NOT NULL,
 	"quantity" numeric DEFAULT '0' NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "symbols" (
+CREATE TABLE IF NOT EXISTS "symbols" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"symbol" varchar(10) NOT NULL,
 	"name" varchar(255),
@@ -40,4 +40,4 @@ CREATE TABLE "symbols" (
 	CONSTRAINT "symbols_symbol_unique" UNIQUE("symbol")
 );
 --> statement-breakpoint
-ALTER TABLE "transactions" ADD COLUMN "symbol" varchar(10) DEFAULT 'TNV';
+ALTER TABLE "transactions" ADD COLUMN IF NOT EXISTS "symbol" varchar(10) DEFAULT 'TNV';
