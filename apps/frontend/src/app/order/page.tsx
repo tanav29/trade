@@ -25,7 +25,7 @@ export default function OrderPage() {
     : symbols[0]!.symbol;
 
   return (
-    <div className="px-4 py-6">
+    <div className="max-w-6xl px-2 py-3 sm:px-4 mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Orders</h1>
         <select

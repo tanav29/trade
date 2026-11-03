@@ -27,7 +27,7 @@ export default function TradePage() {
   const selected = symbols.find((s) => s.symbol === symbol);
 
   return (
-    <main className="mx-auto max-w-[1800px] px-3 py-5 sm:px-6 terminal">
+    <main className="mx-auto max-w-6xl px-2 py-3 sm:px-4 terminal">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-1 text-sm font-medium text-slate-400">Markets</p>
@@ -40,12 +40,7 @@ export default function TradePage() {
           </select>
         </div>
       </div>
-      <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-900 px-5 py-3">
-        <span className="grid h-10 w-10 place-items-center rounded-md bg-blue-950 text-sm font-bold text-blue-300">{symbol.slice(0, 2)}</span>
-        <div><p className="font-semibold text-slate-100">{symbol}</p><p className="text-xs text-slate-400">{selected?.name}</p></div>
-        <span className="ml-auto text-xs font-medium text-slate-400">Equity market</span>
-      </div>
-      <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="min-w-0 space-y-3"><Chart symbol={symbol} /><Depth symbol={symbol} /></div>
         <MakeOrder symbol={symbol} />
       </div>

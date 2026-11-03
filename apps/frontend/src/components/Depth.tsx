@@ -69,17 +69,14 @@ const Depth = ({ symbol }: Props) => {
 
   return (
     <Card className="shadow-none">
-      <CardHeader className="pb-3">
-        <h2 className="mb-3 text-base font-semibold">Order book</h2>
+      <CardHeader>
         <div className="flex items-center justify-between text-xs">
           <div className="flex flex-col">
-            <span className="text-muted-foreground">Buy orders</span>
             <span className="text-xl leading-none font-bold text-green-600 dark:text-green-500">
               {buyPct.toFixed(1)}%
             </span>
           </div>
           <div className="flex flex-col text-right">
-            <span className="text-muted-foreground">Sell orders</span>
             <span className="text-xl leading-none font-bold text-red-600 dark:text-red-500">
               {sellPct.toFixed(1)}%
             </span>
@@ -97,7 +94,7 @@ const Depth = ({ symbol }: Props) => {
         </div>
       </CardHeader>
       <CardContent className="pt-2">
-        <div className="text-[12.5px] leading-tight">
+        <div className="text-xs leading-tight">
           <table className="w-full border-separate">
             <thead>
               <tr className="text-xs font-medium">
@@ -125,7 +122,7 @@ const Depth = ({ symbol }: Props) => {
                 return (
                   <tr
                     key={i}
-                    className="align-middle group hover:bg-muted/30 transition-colors"
+                    className="align-middle group hover:bg-muted/30 transition-colors h-6"
                   >
                     <td className="px-2 py-1.5 font-medium">
                       {bid ? `$${bid.price}` : ""}

@@ -30,7 +30,7 @@ export default function RootLayout({
         )}
       >
         <a href="#main-content" className="fixed -top-20 left-4 z-[100] rounded bg-slate-100 px-4 py-2 text-slate-950 focus:top-4">Skip to content</a>
-        <NextTopLoader />
+        <NextTopLoader showSpinner={false} />
         <Providers>
           <Nav />
           <div id="main-content" tabIndex={-1}>{children}</div>
